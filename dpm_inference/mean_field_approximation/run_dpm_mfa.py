@@ -23,7 +23,7 @@ def main(freads_in, fref_in, output_dir, n_starts, K, alpha0, alphabet = 'ACGT-'
     window=[int(window_id.split('-')[2])-1,int(window_id.split('-')[3].split('.')[0])]
     dict_runtime={'window_id': window_id}
 
-    output_name = output_dir+window_id
+    output_name = output_dir+window_id+'-'
 
     if os.path.exists(output_dir)==False: # Check whether the specified path exists or not
         os.makedirs(output_dir) # Create a new directory because it does not exist
@@ -88,19 +88,11 @@ def main(freads_in, fref_in, output_dir, n_starts, K, alpha0, alphabet = 'ACGT-'
     outfile.close()
 
     # write output like in original shorah
-    analyze_results.haplotypes_to_fasta(state_curr_dict, output_name+'-support.fas')
-    analyze_results.correct_reads(state_curr_dict, output_name+'-cor.fas')
+    analyze_results.haplotypes_to_fasta(state_curr_dict, output_name+'support.fas')
+    analyze_results.correct_reads(state_curr_dict, output_name+'cor.fas')
 
     #analyze_results.haplotypes_to_fasta(state_curr_dict, output_dir+'support/'+fname_out_base+'.reads-support.fas')
     #analyze_results.correct_reads(state_curr_dict, output_dir+'corrected/'+fname_out_base+'.reads-cor.fas')
-
-    # write coverage file
-    with open(output_dir+'coverage.txt', 'w') as f:
-        f.write(fref_in+'\t'+ref_id+'\t'+str(1)+'\t'+str(reference_binary.shape[0])+'\t'+str(100))
-
-    # write SNV file
-    #import shorah_snv
-    #test = shorah_snv.main(fref_in,output_dir)
 
     #f_best_run = open(output_dir+'debug/best_run.txt','w')
     f_best_run = open(output_name+'best_run.txt','w')
