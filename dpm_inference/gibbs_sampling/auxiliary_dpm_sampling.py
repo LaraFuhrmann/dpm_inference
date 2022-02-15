@@ -32,9 +32,9 @@ class State:
                     'theta': self.theta,
                     'gamma': self.gamma,
                     'alpha': self.alpha,
-                    'alphabet': self.alphabet,
-                    'n_cluster': len(self.cluster_list),
-                    'haplotypes': str(self.get_sampled_haplotypes())
+                    'alphabet': str(self.alphabet),
+                    'n_cluster': len(self.cluster_list)#,
+                    #'haplotypes': str(self.get_sampled_haplotypes())
                     }
         for idx_read , assigned_cluster in enumerate(self.get_cluster_assignments(reads_list)):
             temp_dict.update({'c_'+str(idx_read): assigned_cluster})

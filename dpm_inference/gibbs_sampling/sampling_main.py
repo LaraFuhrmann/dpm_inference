@@ -35,7 +35,8 @@ def run_chain(conv_lst, chain_id,reads_list,reference_seq,alpha,max_iter,alphabe
         temp_cluster.update_distances(reads_list,reference_seq)
 
     #df_history = preparation.history_dataframe(n_reads=len(reads_list))
-    cols_his =  ['n_iter', 'alpha', 'alphabet', 'n_cluster', 'haplotypes']
+    #cols_his =  ['n_iter', 'alpha', 'alphabet', 'n_cluster', 'haplotypes']
+    cols_his =  ['n_iter', 'alpha', 'alphabet', 'n_cluster']
     cols_his += ['c_'+str(n) for n in range(len(reads_list))]
     cols_his += ['gamma', 'theta']
     cols_his += ['ess_max','gelman_rubin']
@@ -113,10 +114,9 @@ def run_chain(conv_lst, chain_id,reads_list,reference_seq,alpha,max_iter,alphabe
 
                 list_df_chains = [df_t for df_t in conv_lst if isinstance(df_t, pd.DataFrame)]
                 if len(list_df_chains)>1: # a minimum of 2 chains is needed for Gelman-Rubin
-                    conv_gelman_rubin, rhat = conv_diag.check_convergence_gelman_rubin(list_df_chains, threshold_rhat=1.1)
-                    #print('conv_gelman_rubin ',conv_gelman_rubin)
+                    conv_gelman_rubin, rhat = conv_diag.check_convergence_gelman_rubin(list_df_chains, threshold_rhat=1.01)
                     dict_history.update({'conv_gelman_rubin':conv_gelman_rubin,
-                                         'gelman_rubin': rhat})
+                                         'gelman_rubin': rhat.eval})
 
                     if conv_gelman_rubin:
                         conv_lst[chain_id]=True
@@ -125,13 +125,16 @@ def run_chain(conv_lst, chain_id,reads_list,reference_seq,alpha,max_iter,alphabe
             conv_dia = [conv_ess_max, conv_geweke, conv_gelman_rubin]
 
             values, counts = np.unique(conv_dia, return_counts=True)
+
             if 'True' in values:
                 idx_temp = np.where(values=='True')
                 if counts[idx_temp]>=2:
                     chain_converged=True
 
         dict_history.update({'n_iter': k})
-        df_history = df_history.append(dict_history, ignore_index=True)
+        #df_history = df_history.append(dict_history, ignore_index=True)
+        df_new_row = pd.DataFrame(dict_history, index=[0])
+        df_history = pd.concat([df_history, df_new_row])
 
     df_history.to_csv(output_dir+'history_chain'+str(chain_id)+'.csv')
     end_time_total = timer()
